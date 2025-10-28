@@ -10,6 +10,7 @@ We were provided with a list of IDs. Replays have to accessed through the game (
 ## Identifier by Tribe
 To save space (even though it's kinda ridiculous) tribes will referenced by the following identifiers in the code and csv.
 
+
 | Identifier | Tribe    |
 | ---------- | -------- |
 | Tr1        | Xin-xi   |
@@ -24,6 +25,10 @@ To save space (even though it's kinda ridiculous) tribes will referenced by the 
 | Tr10       | Ai-Mo    |
 | Tr11       | Quetzali |
 | Tr12       | Yadakk   |
+| Tr13       | Aquarion |
+| Tr14       | Elyrion  |
+| Tr15       | Polaris  |
+| Tr16       | Cymanti  |
 
 identifier2tribe = {
     "Tr1": "Xin-xi",
@@ -37,40 +42,53 @@ identifier2tribe = {
     "Tr9": "Zebasi",
     "Tr10": "Ai-Mo",
     "Tr11": "Quetzali",
-    "Tr12": "Yadakk"
+    "Tr12": "Yadakk",
+    "Tr13": "Aquarion",
+    "Tr14": "Elyrion",
+    "Tr15": "Polaris",
+    "Tr16": "Cymanti"
 }
 
 ## Color values by tribe:
 Each tribe has a distinct color value associated with it. This color can be seen in the territory borders (if there are no duplicate tribes in a game). It can also be seen in the circle in the top left corner while watching replays (which can be used for turn and tribe-detection).
 
-| Identifier | Color    |
-| ---------- | -------- |
-| Tr1        ||
-| Tr2        ||
-| Tr3        ||
-| Tr4        ||
-| Tr5        ||
-| Tr6        ||
-| Tr7        ||
-| Tr8        ||
-| Tr9        ||
-| Tr10       ||
-| Tr11       ||
-| Tr12       ||
+| Identifier | Color           |
+|------------|-----------------|
+| Tr1        | (204, 0, 0)     |
+| Tr2        | (0, 0, 255)     |
+| Tr3        | (53, 37, 20)    |
+| Tr4        | (255, 255, 0)   |
+| Tr5        | (0, 255, 0)     |
+| Tr6        | (153, 102, 0)   |
+| Tr7        | (171, 59, 214)  |
+| Tr8        | (255, 255, 255) |
+| Tr9        | (255, 153, 0)   |
+| Tr10       | (54, 226, 170)  |
+| Tr11       | (39, 92, 74)    |
+| Tr12       | (125, 35, 28)   |
+| Tr13       | (243, 131, 129) |
+| Tr14       | (255, 0, 153)   |
+| Tr15       | (182, 161, 133) |
+| Tr16       | (194, 253, 0)   |
 
-identifier2tribe = {
-    "Tr1": ,
-    "Tr2": ,
-    "Tr3": ,
-    "Tr4": ,
-    "Tr5": ,
-    "Tr6": ,
-    "Tr7": ,
-    "Tr8": ,
-    "Tr9": ,
-    "Tr10": ,
-    "Tr11": ,
-    "Tr12": ,
+
+identifier2color = {
+    "Tr1": (204, 0, 0),
+    "Tr2": (0, 0, 255),
+    "Tr3": (53, 37, 20),
+    "Tr4": (255, 255, 0),
+    "Tr5": (0, 255, 0),
+    "Tr6": (153, 102, 0),
+    "Tr7": (171, 59, 214),
+    "Tr8": (255, 255, 255),
+    "Tr9": (255, 153, 0),
+    "Tr10": (54, 226, 170),
+    "Tr11": (39, 92, 74),
+    "Tr12": (125, 35, 28),
+    "Tr13": (243, 131, 129),
+    "Tr14": (255, 0, 153),
+    "Tr15": (182, 161, 133),
+    "Tr16": (194, 253, 0)
 }
 
 ## Format for saving tech development
