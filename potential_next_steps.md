@@ -31,6 +31,6 @@ It may be worth considering to split the List of IDs and every subsequent file i
 | 2    |       |       |       |       |       |     |
 | ...  |       |       |       |       |       |     |
 
-Tech development should be saved in form of a 10-digit number according to the format presented in general-notes.
+Tech development should be saved in form of a 5-digit number according to the format presented in general-notes.
 
 
