@@ -8,7 +8,7 @@ def get_pixel_color(img: Image.Image, pos: tuple):
 if __name__ == "__main__":
     coords=(10,10)
     img=ws.getWindowImg()
-    img.save("hello.png")
+    img.save("Screenshot.png")
     get_pixel_color(img, coords)
 
 
