@@ -49,10 +49,10 @@ def capture_window_by_id(window_id):
 
 
 
-def resize_window(window_title_substring, new_width, new_height):
+def resize_window(window_title_substring, new_width, new_height, bringToFront=False):
     # Use pywinctl to find the window and resize it
     all = pywinctl.getAllWindows()
-    print(all)
+    #print(all)
     #windows=[i.title if window_title_substring in i.title else ... for i in all]
     for i in all:
         if window_title_substring in i.title:
@@ -64,9 +64,21 @@ def resize_window(window_title_substring, new_width, new_height):
 
     # Resize window
     window.resizeTo(new_width, new_height)
-    # Optional: Bring window to front for clean capture
+
+    if bringToFront: window.activate()# Optional: Bring window to front for clean capture
+    window.moveTo(0,0)#Optional: Bring to top left corner
     # Pause shortly to let the OS apply the resize before capture
     time.sleep(0.5)
     return window
 
-
+def getWindowImg(size=(800,500), windowName="Polytopia", topBorderAdjust=28, bringToFront=True):
+    #print(f"Searching for window with title containing '{windowName}'...")
+    width=size[0]
+    height=topBorderAdjust+size[1]
+    resize_window(windowName, width, height ,bringToFront)
+    cg_window_id = get_cgwindow_id(windowName)
+    #print(f"Found window ID: {cg_window_id}. Capturing window image...")
+    img = capture_window_by_id(cg_window_id)
+    box = (0, topBorderAdjust, width, height)
+    cropped_img=img.crop(box)
+    return cropped_img
