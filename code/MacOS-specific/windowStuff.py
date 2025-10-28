@@ -6,8 +6,15 @@ import numpy as np      # NumPy for fast buffer manipulation
 import pywinctl         # Cross-platform window control
 import time             # Simple delays
 
-# this script uses macOS-specific APIs and will not work on other platforms
+# NOTE TO SELF:
+# Mac-retina displays have a scaling factor of 2.0.
+# Internally they tell every program, that they only have 1400x900.
+# This is bullshit and they actually have 2800x1800.
+# 1 logical pixel is = 2 actual pixels
+# The following code accounts for it, so ignore it.
+# The images output are scaled down their logical resolution.
 
+# this script uses macOS-specific APIs and will not work on other platforms
 def get_cgwindow_id(window_title_substring: str) -> int:
     """Return the CoreGraphics window ID for the first window whose title or
     owner name contains the given substring.  Exits the program if no match is found."""
@@ -67,11 +74,10 @@ def resize_window(window_title_substring: str, new_width: int=800, new_height: i
 
 def getWindowImg(size=(800, 500), window_name: str = "Polytopia",
                  top_border_adjust: int = 28, bring_to_front: bool = True) -> Image.Image:
-    """Resize the named window, capture it as a Pillow image, and crop off the title bar.
+    """Does not resize the named window, capture it as a Pillow image, and crop off the title bar.
     ``topBorderAdjust`` is the height to remove from the top."""
     width, body_height = size
     height = top_border_adjust + body_height
-    resize_window(window_name, width, height, bring_to_front)
     cg_window_id = get_cgwindow_id(window_name)
     img = capture_window_by_id(cg_window_id)
     # Crop off the title bar
