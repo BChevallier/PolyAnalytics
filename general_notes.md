@@ -72,3 +72,10 @@ identifier2tribe = {
     "Tr11": ,
     "Tr12": ,
 }
+
+## Format for saving tech development
+The current technological development of any given player can be saved in a 5-digit number with the following format.
+When no technology is unlocked, we start at 00000. Each position corresponds to a a branch of the tech tree, with the first being the "Organisation" branch and the rest following a clockwise Order. The number at a position becomes 1 if only the first tech of the corresponding branch is unlocked. For example: 10010 would mean the player unlocked "Organisation" and "Hunting".
+ 
+After the first tech on a branch, one adds +3 to the branch number for each further tech on the counterclockwise path and +1 one for each tech on the clockwise path. This gives a unique 5-digit number for every possible tech combination, where 99999 means everything is unlocked.
+
