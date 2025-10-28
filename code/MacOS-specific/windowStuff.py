@@ -44,7 +44,7 @@ def capture_window_by_id(window_id: int) -> Image.Image:
     arr = arr[..., [2, 1, 0, 3]]
     return Image.fromarray(arr)
 
-def resize_window(window_title_substring: str, new_width: int, new_height: int,
+def resize_window(window_title_substring: str, new_width: int=800, new_height: int=500,
                   bringToFront: bool = False):
     """Find the first window containing the substring, resize it, optionally bring it to
     the front, and move it to the top-left corner. Returns the window object."""
@@ -78,7 +78,16 @@ def getWindowImg(size=(800, 500), window_name: str = "Polytopia",
     box = (0, top_border_adjust, width, height)
     return img.crop(box)
 
-def get_pixel_color(window_id: int, x: int, y: int, top_border: int = 28) -> tuple:
+def get_color_from_coords(img, coords):
+    """Return a list of pixel values from ``img`` at each (x, y) in ``coords``."""
+    color_list = []
+    for x, y in coords:
+        color_list.append(img.getpixel((x, y)))
+    return color_list
+
+#DON'T USE
+#ONLY EFFICIENT FOR VERY SMALL AMOUNTS OF PIXELS
+def get_single_pixel_color(window_id: int, x: int, y: int, top_border: int = 28) -> tuple:
     """Return the RGBA colour of the pixel at (x, y) inside the specified window,
     compensating for a title bar of height ``top_border``."""
     global_x = x
@@ -99,8 +108,3 @@ def get_pixel_color(window_id: int, x: int, y: int, top_border: int = 28) -> tup
     arr.shape = (1, bpr // 4, 4)
     b, g, r, a = arr[0, 0]
     return (int(r), int(g), int(b))
-
-def get_color_from_coords(x: int, y: int, top_border_adjust: int = 28, window_name: str = "Polytopia", ) -> tuple:
-    """Return the RGB colour of the pixel at (x, y) in the named window."""
-    win_id = get_cgwindow_id(window_name)
-    return get_pixel_color(win_id, x, y, top_border_adjust)
