@@ -53,4 +53,5 @@ def identify_tribe(color):
 
 
 if __name__ == "__main__":
-    print(identify_tribe((0,0,220)))
+    #print(identify_tribe((0,0,220)))
+    print(color_distance_rgb((0,0,0),(0,0,0)))
