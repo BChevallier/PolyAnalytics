@@ -90,6 +90,9 @@ identifier2color = {
     "Tr15": (182, 161, 133),
     "Tr16": (194, 253, 0)
 }
+## Frame Format Convention
+The data will be collected by looking at frames of the Polytopia replay. As most of the datacollection will be hardcoded pixelcolor detection, all the code is extremely sensitive to frame size. To avoid mistakes we'll stick to a frame size of width 800p and height 500p. Meaning that the Polytopia window has to be resized so that the game interface (not the window borders) meets this exact standard. This is an arbitrary convention. To reduce harm from failed crop color detection should be done at coordinates with room for (vertical) error.
+
 
 ## Format for saving tech development
 The current technological development of any given player can be saved in a 5-digit number with the following format.
