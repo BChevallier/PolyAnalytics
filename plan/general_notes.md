@@ -97,4 +97,4 @@ The data will be collected by looking at frames of the Polytopia replay. As most
 ## Format for saving tech development
 The current technological development of any given player can be saved in a 10-digit number with the following format.
 When no technology is unlocked, we start at 0000000000. Each position corresponds to a a branch of the tech tree, with the first being the "Trade" branch and the rest following a clockwise order. Level 1 techs are counted into two branches each (E.g. "Fishing" is part of "Navigation" AND "Aquatism". To get the value of a digit one adds +1 for every first level, +2 for every second level, and +4 for every third level tech on a branch. Doing this gives a unique value for every branch configuration and so a unique 10-digit ID for every tech configuration.
-
+For example a 6666666666 would mean every tech is unlocked. A 1100610000 means "Riding" and the whole branch to "Smithery" is unlocked.
