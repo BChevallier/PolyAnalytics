@@ -53,9 +53,9 @@ def identify_tribe(color):
         return None
 
 
-# returns True if color is more green than blue
+# returns True if color is more green than blue and has a lot of green
 def check_if_complete(color):
-    return True if color[1]>color[2] else False
+    return True if color[1]>color[2] and color[1]>100 else False
 
 
 
