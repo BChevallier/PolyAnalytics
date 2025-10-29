@@ -2,11 +2,12 @@
 # use pyvirtualdisplay with Xvfb this is without gpu !!
 #
 # todo: test on ubuntu server
-from pyvirtualdisplay import display
+from pyvirtualdisplay import Display
 import subprocess
 import time
 import os
 from PIL import Image
+import pyscreenshot as ImageGrap
 
 #start Xvfb virtual display :)
 display = Display(visible=0, size=(800, 500), color_depth=24)
@@ -18,7 +19,7 @@ p = subprocess.Popen(["firefox", "--no-remote", "--new-instance", "https://archl
 
 time.sleep(6)
 img = ImageGrap.grab()
-im.save("firefox_headless.png")
+img.save("firefox_headless.png")
 print("It works now yay")
 
 p.terminate()
