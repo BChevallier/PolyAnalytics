@@ -5,7 +5,7 @@ import csv
 # todo:
 # test code         add batching
 dataset_folder = os.path.join(os.getcwd(), 'data')
-path = path.join(dataset_folder, '1v1replays.csv')
+path = os.path.join(dataset_folder, '1v1replays.csv')
 
 # now take the ids and make a dataset with 10 batches to get a array of 10*100
 # format of the ids: UUID

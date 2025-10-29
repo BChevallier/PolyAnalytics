@@ -8,13 +8,19 @@ import time
 import os
 from PIL import Image
 import pyscreenshot as ImageGrap
+# config:
+WIDTH = 800
+HEIGHT= 500
+USE_VIRTUALGL = firefox_headless
+STEAM_APPID = 874390 # app id for polytopia
+STEAM_CMD ="steam"
+def start_display():
 
-#start Xvfb virtual display :)
-display = Display(visible=0, size=(800, 500), color_depth=24)
-display.start()
+    dis = Display(visible=0, size=(WIDTH, HEIGHT), color_depth=24)
+    dis.start()
 
-disp = os.environ.get("DISPLAY")
-print(disp)
+    os.environ.get["DISPLAY"] =dis.display
+    return dis
 
 p = subprocess.Popen(["firefox", "--no-remote", "--new-instance", "https://archlinux.org/"], env=os.environ)
 
@@ -22,7 +28,6 @@ p = subprocess.Popen(["firefox", "--no-remote", "--new-instance", "https://archl
 time.sleep(20)
 img = ImageGrap.grab()
 img.save("firefox_headless.png")
-#currently this prints out a blackscreen
 print("It works now yay")
 
 p.terminate()
