@@ -18,19 +18,16 @@ def pause_game():
 
 
 def mouse_click_nominal(x, y):
-    screen = AppKit.NSScreen.mainScreen()
-    screen_height = screen.frame().size.height
     menu_bar_height = 28
+    y+= menu_bar_height
     # Convert nominal y (top-left origin) to Quartz bottom-left origin
-    quartz_y = screen_height - y - 1 - menu_bar_height  # -1 because coordinates are zero-based
     tap_location = Quartz.kCGHIDEventTap
     left_mouse_button = Quartz.kCGMouseButtonLeft
-
     # Create and post mouse down event
     mouse_down = Quartz.CGEventCreateMouseEvent(
         None,
         Quartz.kCGEventLeftMouseDown,
-        (x, quartz_y),
+        (x, y),
         left_mouse_button
     )
     Quartz.CGEventPost(tap_location, mouse_down)
@@ -39,7 +36,7 @@ def mouse_click_nominal(x, y):
     mouse_up = Quartz.CGEventCreateMouseEvent(
         None,
         Quartz.kCGEventLeftMouseUp,
-        (x, quartz_y),
+        (x, y),
         left_mouse_button
     )
     Quartz.CGEventPost(tap_location, mouse_up)
