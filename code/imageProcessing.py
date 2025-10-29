@@ -1,4 +1,5 @@
-
+import colorProcessing as cp
+import numpy as np
 
 #returns the cropped out info about maptype and mapsize in a tuple.
 #iput has to be 800x500 PIL Image object.
@@ -23,3 +24,70 @@ def test_pixel_coords(img,coords, squareSize=50, show_color=False):
     image.putpixel(coords,(255,0,255))
     box=(coords[0]-hw,coords[1]-hw,coords[0]+hw,coords[1]+hw)
     return image.crop(box)
+
+tech_locations=np.array([
+    (403, 204),
+    (393, 171),
+    (383, 138),
+    (430, 184),
+    (458, 164),
+    (425, 236),
+    (453, 217),
+    (481, 197),
+    (453, 257),
+    (480, 278),
+    (400, 269),
+    (428, 289),
+    (456, 310),
+    (390, 301),
+    (378, 333),
+    (362, 255),
+    (352, 288),
+    (340, 320),
+    (329, 256),
+    (295, 255),
+    (363, 215),
+    (329, 215),
+    (295, 215),
+    (353, 183),
+    (343, 150)
+])
+
+#uses pixel colors to get tech progression identifier out of image. A nightmare...
+def get_techs(img):
+    tech_progress =0
+    for i,coords in enumerate(tech_locations):
+        color=img.getpixel(coords)[:3]
+        if cp.check_if_complete(color):
+            if i % 5 == 0: tech_progress+=11* 100 ** (4-i//5)
+            elif i % 5 == 1: tech_progress+= 2 * 100 ** (4-i//5) * 10
+            elif i % 5 == 2: tech_progress+= 4 * 100 ** (4-i//5) * 10
+            elif i % 5 == 3: tech_progress+= 2 * 100 ** (4-i//5)
+            elif i % 5 == 4: tech_progress+= 4 * 100 ** (4-i//5)
+        else: ...
+    tech_progress=str(tech_progress)
+    tech_progress="0"*(10-len(tech_progress))+tech_progress
+    return tech_progress
+
+tech2tribe={
+    "0000110000": "Tr1",
+    "0011000000": "Tr2",
+    "0000000011": "Tr3",
+    "1100000000": "Tr4",
+    "0000001100": "Tr5",
+    "0000000020": "Tr6",
+    "0000000000": "Tr7",
+    "0000400000": "Tr8",
+    "0020000000": "Tr9",
+    "0000040000": "Tr10",
+    "0002000000": "Tr11",
+    "2000000000": "Tr12",
+}
+
+#returns Tribe corresponding to starting tech config. Can return None.
+def tribe_from_tech(tech):
+    global tech2tribe
+    if tech in tech2tribe:
+        return tech2tribe[tech]
+    else:
+        return None
