@@ -31,12 +31,11 @@ def batch_ids():
     arr = np.array(ids, dtype=object).reshape((1000, 10))
     df = pd.DataFrame(arr)
     df.to_csv('out.csv', index=False, header=False) 
+
+    return batch
+
+
 def takebatch(rownum: int) -> list[str]:
     ids = pd.read_csv(path_of_batched_ids, header=None, dtype=str)
     row_values = ids.iloc[rownum].dropna().astype(str).tolist()
-    return row_values
-
-
-    return batch
-if __name__ == "__main__":
-    print(takebatch(3))
+    return np.array(row_values)
