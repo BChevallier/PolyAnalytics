@@ -52,6 +52,12 @@ def identify_tribe(color):
         return None
 
 
+# returns True if color is more green than blue
+def check_if_complete(color):
+    return True if color[1]>color[2] else False
+
+
+
 if __name__ == "__main__":
     #print(identify_tribe((0,0,220)))
     print(color_distance_rgb((0,0,0),(0,0,0)))
