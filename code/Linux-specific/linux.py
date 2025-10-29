@@ -13,13 +13,16 @@ import pyscreenshot as ImageGrap
 display = Display(visible=0, size=(800, 500), color_depth=24)
 display.start()
 
+disp = os.environ.get("DISPLAY")
+print(disp)
 
 p = subprocess.Popen(["firefox", "--no-remote", "--new-instance", "https://archlinux.org/"], env=os.environ)
 
 
-time.sleep(6)
+time.sleep(20)
 img = ImageGrap.grab()
 img.save("firefox_headless.png")
+#currently this prints out a blackscreen
 print("It works now yay")
 
 p.terminate()
