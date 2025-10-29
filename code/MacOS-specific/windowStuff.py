@@ -52,7 +52,7 @@ def capture_window_by_id(window_id: int) -> Image.Image:
     return Image.fromarray(arr)
 
 def resize_window(window_title_substring: str, new_width: int=800, new_height: int=500,
-                  bringToFront: bool = False):
+                  bringToFront: bool = True):
     """Find the first window containing the substring, resize it, optionally bring it to
     the front, and move it to the top-left corner. Returns the window object."""
     all_windows = pywinctl.getAllWindows()
@@ -72,13 +72,12 @@ def resize_window(window_title_substring: str, new_width: int=800, new_height: i
     time.sleep(0.5)
     return window
 
-def getWindowImg(size=(800, 500), window_name: str = "Polytopia",
+def getWindowImg(cg_window_id, size=(800, 500),
                  top_border_adjust: int = 28, bring_to_front: bool = True) -> Image.Image:
     """Does not resize the named window, capture it as a Pillow image, and crop off the title bar.
     ``topBorderAdjust`` is the height to remove from the top."""
     width, body_height = size
     height = top_border_adjust + body_height
-    cg_window_id = get_cgwindow_id(window_name)
     img = capture_window_by_id(cg_window_id)
     # Crop off the title bar
     box = (0, top_border_adjust, width, height)
