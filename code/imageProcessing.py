@@ -15,9 +15,11 @@ def get_menu_info(image):
 #will output cropped image around specified location
 #and with specified size(default=50). Pixel at given
 #coordinate will be painted pink
-def test_pixel_coords(img,coords, squareSize=50):
+def test_pixel_coords(img,coords, squareSize=50, show_color=False):
     hw=squareSize//2
     image=img.copy()
+    if show_color:
+        print(image.getpixel(coords))
     image.putpixel(coords,(255,0,255))
     box=(coords[0]-hw,coords[1]-hw,coords[0]+hw,coords[1]+hw)
     return image.crop(box)
