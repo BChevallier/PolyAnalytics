@@ -11,3 +11,13 @@ def get_menu_info(image):
     type_img=image.crop(type_box)
     return (size_img, type_img)
 
+#function to test where some coords are on an image.
+#will output cropped image around specified location
+#and with specified size(default=50). Pixel at given
+#coordinate will be painted pink
+def test_pixel_coords(img,coords, squareSize=50):
+    hw=squareSize//2
+    image=img.copy()
+    image.putpixel(coords,(255,0,255))
+    box=(coords[0]-hw,coords[1]-hw,coords[0]+hw,coords[1]+hw)
+    return image.crop(box)
