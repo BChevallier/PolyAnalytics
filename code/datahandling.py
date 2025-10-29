@@ -1,16 +1,16 @@
 import os
-#import numpy
 import csv
 from pathlib import Path
 import re
 import pandas as pd
 import numpy as np
-
+#important functions: 
+# takebatch(rownumber)
 
 
 dataset_folder = os.path.join(Path(__file__).resolve().parent.parent, 'data')
 path = os.path.join(dataset_folder, '1v1replays.csv')
-
+path_of_batched_ids = os.path.join(dataset_folder, 'out.csv')
 # now take the ids and make a dataset with 10 batches to get a array of 10*100
 # format of the ids: UUID
 def read_ids(path: path, delimiter=',') -> list[str]:
@@ -31,7 +31,12 @@ def batch_ids():
     arr = np.array(ids, dtype=object).reshape((1000, 10))
     df = pd.DataFrame(arr)
     df.to_csv('out.csv', index=False, header=False) 
+def takebatch(rownum: int) -> list[str]:
+    ids = pd.read_csv(path_of_batched_ids, header=None, dtype=str)
+    row_values = ids.iloc[rownum].dropna().astype(str).tolist()
+    return row_values
 
+
+    return batch
 if __name__ == "__main__":
-    ids = read_ids(path)
-    print("found", len(ids), "IDs. First 10:", ids[:10])
+    print(takebatch(3))
