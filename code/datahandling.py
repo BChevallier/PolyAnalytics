@@ -30,8 +30,7 @@ def batch_ids():
 
     arr = np.array(ids, dtype=object).reshape((1000, 10))
     df = pd.DataFrame(arr)
-    df.to_csv('out.csv', index=False, header=False) 
-
+    df.to_csv('out.csv', index=False, header=False)
     return batch
 
 
