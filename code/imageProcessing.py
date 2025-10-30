@@ -3,14 +3,18 @@ import numpy as np
 from PIL import ImageOps, Image
 import pytesseract
 
+#function to binarize image.
+#DOESN'T WORK
+def binarize(img, threshold=100):
+    #using point is quicker than iterating over every pixel coordinate
+    return img.point(lambda p: 255 if p > threshold else 0)
+
 #upscales PIL by a certain factor. Only helps some of the time
 def upscale_image(img, factor=2):
     new_width = img.width * factor
     new_height = img.height * factor
     # Resize (upscale) the image
     upscaled_img = img.resize((new_width, new_height), Image.LANCZOS)
-    # Save or show
-    upscaled_img.save('upscaled_image.png')
     return upscaled_img
 
 # A sloppy attempt to fix ocr artifacts.
@@ -72,15 +76,12 @@ def get_menu_info(image):
 #function that crops out the economic info of a replay frame.
 #returns tuple with cropped images for current star count, and current revenue
 def get_eco_info(image):
-    cur_box=(395, 23, 440, 38)
-    rev_box =(405,9,445,21)
+    cur_box=(411, 23, 437, 38)
+    rev_box =(415,9,435,21)
     #cropped images
     cur_img=image.crop(cur_box)
     rev_img=image.crop(rev_box)
-    #grayscale images
-    gray_cur_img=ImageOps.grayscale(cur_img)
-    gray_rev_img=ImageOps.grayscale(rev_img)
-    return (gray_rev_img,gray_cur_img)
+    return (rev_img,cur_img)
 
 #function to test where some coords are on an image.
 #will output cropped image around specified location
