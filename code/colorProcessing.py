@@ -26,7 +26,7 @@ def color_distance_rgb(rgb1, rgb2):
     distance = math.sqrt((r1 - r2)**2 + (g1 - g2)**2 + (b1 - b2)**2)
     max_distance = math.sqrt(255**2 + 255**2 + 255**2)  # ~441.67
     normalized_distance = distance / max_distance
-    print(f"normalized distance is: {normalized_distance}")
+    #print(f"normalized distance is: {normalized_distance}")
     return normalized_distance  # 0 means identical, 1 means maximally different
 
 def colors_are_similar(rgb1, rgb2):
