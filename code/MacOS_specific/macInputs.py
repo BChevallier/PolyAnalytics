@@ -58,7 +58,7 @@ def scroll(amount):
     Quartz.CGEventPost(tap_location, scroll_event)
     return None
 
-#drags mouse 300 pixels diagonally to the bottom left in 10p increments
+#drags mouse a few pixels diagonally to the bottom left in 10p increments
 def mouse_drag(x,y):
     tap_location = Quartz.kCGHIDEventTap
     left_mouse_button = Quartz.kCGMouseButtonLeft
@@ -80,7 +80,7 @@ def mouse_drag(x,y):
         mouse_drag = Quartz.CGEventCreateMouseEvent(
             None,
             Quartz.kCGEventLeftMouseDragged,
-            (x+i, y+i),
+            (x+2*i, y+i),
             left_mouse_button
         )
         Quartz.CGEventPost(tap_location, mouse_drag)
@@ -89,7 +89,7 @@ def mouse_drag(x,y):
     mouse_up = Quartz.CGEventCreateMouseEvent(
         None,
         Quartz.kCGEventLeftMouseUp,
-        (x+200, y+200),
+        (x+400, y+200),
         left_mouse_button
     )
     Quartz.CGEventPost(tap_location, mouse_up)
