@@ -42,13 +42,14 @@ def colors_are_similar(rgb1, rgb2):
 def identify_tribe(color):
     min_distance = float('inf')
     closest_tribe = None
+    closest_color = None
     for known_color, tribe in color2identifier.items():
         dist = color_distance_rgb(color, known_color)
         if dist < min_distance:
             min_distance = dist
             closest_tribe = tribe
-
-    if colors_are_similar(color, list(color2identifier.keys())[list(color2identifier.values()).index(closest_tribe)]):
+            closest_color = known_color
+    if colors_are_similar(color, closest_color):
         return closest_tribe
     else:
         return None
