@@ -18,6 +18,7 @@ color2identifier = {
     (182, 161, 133): 'Tr15',
     (194, 253, 0):   'Tr16',
     (103, 140, 48):  'Tr13',#Skin of aquarion.
+    (117, 251, 76):  'Tr5', #Kickoo being constantly misrendered...
 }
 
 
