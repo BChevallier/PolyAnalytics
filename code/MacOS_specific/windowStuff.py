@@ -52,7 +52,7 @@ def capture_window_by_id(window_id: int) -> Image.Image:
     return Image.fromarray(arr)
 
 def resize_window(window_title_substring: str, new_width: int=800, new_height: int=500,
-                  bringToFront: bool = True):
+                  bringToFront: bool = False):
     """Find the first window containing the substring, resize it, optionally bring it to
     the front, and move it to the top-left corner. Returns the window object."""
     all_windows = pywinctl.getAllWindows()

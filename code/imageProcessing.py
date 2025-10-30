@@ -2,6 +2,11 @@ import colorProcessing as cp
 import numpy as np
 from PIL import ImageOps, Image
 import pytesseract
+from MacOS_specific import startReplayOnSteam
+from MacOS_specific import windowStuff as ws
+import colorProcessing as cpro
+import time
+
 
 #function to binarize image.
 #DOESN'T WORK
@@ -176,8 +181,17 @@ def get_color_from_coords(img, coords):
     """Return a list of pixel values from ``img`` at each (x, y) in ``coords``."""
     color_list = []
     for x, y in coords:
-        color_list.append(img.getpixel((x, y)))
+        color_list.append(img.getpixel((x, y))[:3])
     return color_list
 
 if __name__ == "__main__":
-    ...
+    #startReplayOnSteam.open_replay("18bf0a54-c887-406c-4195-08dd25c45c7b")
+    #time.sleep(1.5)
+    id=ws.get_cgwindow_id("Polytopia")
+    frame=ws.getWindowImg(id)
+    player_color = get_color_from_coords(frame, [(9, 33)])[0]
+    tribe_by_color = cpro.identify_tribe(player_color)
+    #print(cpro.color_distance_rgb(player_color,(0,255,0)))
+    print(tribe_by_color)
+    img=test_pixel_coords(frame,(9,33))
+    img.save("Test.png")
