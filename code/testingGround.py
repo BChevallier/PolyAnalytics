@@ -7,13 +7,14 @@ from MacOS_specific import macInputs as inp
 import time
 import pandas as pd
 import numpy as np
+import sys
 
 
 if __name__ == "__main__":
     win_id=ws.get_cgwindow_id("Polytopia")
     window = ws.resize_window("Polytopia")
-    for i in range(0,1):
-        columns=["mType","mSize","TribeA","TribeB"]
+    for i in range(10):
+        columns=["mType","mSize","TribeA","TribeB","1v1"]
         batch=datahandling.takebatch(i)
         #batch=["0ad7b170-68d8-496e-3fea-08dd25c45c7b"]
         df=pd.DataFrame(index=batch, columns=columns)
@@ -34,20 +35,20 @@ if __name__ == "__main__":
             mSize, mType = ipro.get_menu_info(frame)
             #print(f"mSize is {mSize}")
             #print(f"mType is {mType}")
-            df.at[id, "mSize"]=mSize
+            df.at[id, "mSize"] = mSize
             df.at[id, "mType"] = mType
             inp.press_key(53)#escape menu
             #see player 1
             for Player in ["A","B"]:
                 inp.press_key(18 if Player=="A" else 19)
-                time.sleep(0.2)
+                time.sleep(0.1)
                 frame = ws.getWindowImg(win_id)
                 #frame.save(f"Game{Player}.png")
                 player_color=ipro.get_color_from_coords(frame,[(9,33)])[0]
                 tribe_by_color=cpro.identify_tribe(player_color)
                 #print(f"Tribe by color {Player}: {tribe_by_color}")
                 inp.mouse_click_nominal(700,430) #open tech tree
-                time.sleep(0.2)
+                time.sleep(0.1)
                 inp.scroll(-50) #zoom out
                 time.sleep(0.2)
                 frame = ws.getWindowImg(win_id) #screenshot
@@ -61,9 +62,18 @@ if __name__ == "__main__":
                     df.at[id, f"Tribe{Player}"] = np.nan
                 inp.press_key(53)
                 time.sleep(0.2)
-        df.to_csv(f"testing/secondBatch{i}.csv")
+            inp.press_key(20)#press 3 to see if more than 2 player
+            time.sleep(0.3)
+            frame = ws.getWindowImg(win_id)
+            if ipro.get_color_from_coords(frame,[(9,33)])[0]==player_color:
+                df.at[id, "1v1"] = True
+            else:
+                df.at[id, "1v1"] = False
+            if df.loc[id].iloc[:4].isnull().all(): sys.exit()
+            time.sleep(30)
+        df.to_csv(f"testing/Batch{i}.csv")
         print(df)
-        time.sleep(3)
+
 
 
 
