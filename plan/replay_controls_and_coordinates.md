@@ -47,3 +47,6 @@ The following provides the coordinates (in a 800x500 image with 0-0 at the top l
 
 ### Turn detection
 Turn detection should be done by looking at the color of the pixel at (10,33). This one will always have the color of the currently playing tribe. 
+
+### End detection
+Detecting the end of a game, can be done by looking at the pixel at (740,430). This one will turn greenish, when the game ended.
