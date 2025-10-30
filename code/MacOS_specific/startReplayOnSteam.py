@@ -4,9 +4,9 @@ import time
 #opens replay from id. Polytopia window has to be already open
 def open_replay(id):
     # Steam URL to run the game
-    steam_url = f"'steam://run/874390//opengame?id={id}'"
+    steam_url = f"steam://run/874390//opengame?id={id}"
     # Use 'open' to launch the steam URL directly
-    subprocess.run("open "+steam_url,shell=True)
+    subprocess.Popen(['open', steam_url])
 
 if __name__=="__main__":
     time.sleep(5)

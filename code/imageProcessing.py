@@ -185,7 +185,7 @@ def get_color_from_coords(img, coords):
     return color_list
 
 if __name__ == "__main__":
-    #startReplayOnSteam.open_replay("18bf0a54-c887-406c-4195-08dd25c45c7b")
+    #startReplayOnSteam.open_replay("bb363954-782c-4c5d-40c9-08dd25c45c7b")
     #time.sleep(1.5)
     id=ws.get_cgwindow_id("Polytopia")
     frame=ws.getWindowImg(id)
