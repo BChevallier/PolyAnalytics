@@ -171,3 +171,13 @@ def tribe_from_tech(tech):
         return tech2tribe[tech]
     else:
         return None
+
+def get_color_from_coords(img, coords):
+    """Return a list of pixel values from ``img`` at each (x, y) in ``coords``."""
+    color_list = []
+    for x, y in coords:
+        color_list.append(img.getpixel((x, y)))
+    return color_list
+
+if __name__ == "__main__":
+    ...

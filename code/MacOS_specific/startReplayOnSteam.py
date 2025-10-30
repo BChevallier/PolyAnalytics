@@ -1,4 +1,5 @@
 import subprocess
+import time
 
 #opens replay from id. Polytopia window has to be already open
 def open_replay(id):
@@ -8,4 +9,6 @@ def open_replay(id):
     subprocess.run("open "+steam_url,shell=True)
 
 if __name__=="__main__":
+    time.sleep(5)
+    print("Go!")
     open_replay("0ad7b170-68d8-496e-3fea-08dd25c45c7b")

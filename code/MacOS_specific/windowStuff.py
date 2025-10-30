@@ -83,12 +83,7 @@ def getWindowImg(cg_window_id, size=(800, 500),
     box = (0, top_border_adjust, width, height)
     return img.crop(box)
 
-def get_color_from_coords(img, coords):
-    """Return a list of pixel values from ``img`` at each (x, y) in ``coords``."""
-    color_list = []
-    for x, y in coords:
-        color_list.append(img.getpixel((x, y)))
-    return color_list
+
 
 #DON'T USE
 #ONLY EFFICIENT FOR VERY SMALL AMOUNTS OF PIXELS
