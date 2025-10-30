@@ -1,5 +1,43 @@
 import colorProcessing as cp
 import numpy as np
+from PIL import ImageOps, Image
+import pytesseract
+
+#upscales PIL by a certain factor. Only helps some of the time
+def upscale_image(img, factor=2):
+    new_width = img.width * factor
+    new_height = img.height * factor
+    # Resize (upscale) the image
+    upscaled_img = img.resize((new_width, new_height), Image.LANCZOS)
+    # Save or show
+    upscaled_img.save('upscaled_image.png')
+    return upscaled_img
+
+# A sloppy attempt to fix ocr artifacts.
+# Will return None if it doesn't manage to.
+def clean_size_string(size):
+    possible_sizes = {"121", "196", "256", "324", "400", "900"}
+    for _ in range(3):
+        if size in possible_sizes:
+            return size
+        elif "9" in size and len(size)>3:
+            size=size.replace("9","")
+        elif "9" in size:
+            size=size.replace("9","2")
+    return None
+
+# A sloppy attempt to fix ocr artifacts.
+# Will return None if it doesn't manage to.
+def clean_type_string(type):
+    possible_types={"Continents", "Lakes", "Archipelago", "Water world", "Dryland", "Pangea"}
+    if type in possible_types:
+        return type
+    else:
+        for p_type in possible_types:
+            if p_type in type:
+                return p_type
+        return None
+
 
 #returns the cropped out info about maptype and mapsize in a tuple.
 #iput has to be 800x500 PIL Image object.
@@ -8,9 +46,41 @@ def get_menu_info(image):
     size_box = (330, 122, 360, 136)
     #cropbox for maptype
     type_box= (315, 152, 375, 165)
+    #cropped images
     size_img=image.crop(size_box)
     type_img=image.crop(type_box)
-    return (size_img, type_img)
+    #greyscale images
+    gray_size_img=ImageOps.grayscale(size_img)
+    gray_type_img = ImageOps.grayscale(type_img)
+    #invert image
+    # (Works better because pytesseract was trained on black text on white mostly)
+    inv_size_img=ImageOps.invert(gray_size_img)
+    inv_type_img = ImageOps.invert(gray_type_img)
+    # Upscale because apparently this helps
+    up_size_img=upscale_image(inv_size_img)
+    #up_type_img=upscale_image(inv_type_img)
+    #get string and post process it
+    config = '--psm 7 -c tessedit_char_whitelist=0123456789'
+    size=pytesseract.image_to_string(up_size_img, config=config)
+    clean_size = clean_size_string(size.replace('\n', '').strip())
+
+    config = r'--psm 7 -c tessedit_char_whitelist=abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
+    type=pytesseract.image_to_string(inv_type_img)
+    clean_type = clean_type_string(type.replace('\n', '').strip())
+    return (clean_size, clean_type)
+
+#function that crops out the economic info of a replay frame.
+#returns tuple with cropped images for current star count, and current revenue
+def get_eco_info(image):
+    cur_box=(395, 23, 440, 38)
+    rev_box =(405,9,445,21)
+    #cropped images
+    cur_img=image.crop(cur_box)
+    rev_img=image.crop(rev_box)
+    #grayscale images
+    gray_cur_img=ImageOps.grayscale(cur_img)
+    gray_rev_img=ImageOps.grayscale(rev_img)
+    return (gray_rev_img,gray_cur_img)
 
 #function to test where some coords are on an image.
 #will output cropped image around specified location
