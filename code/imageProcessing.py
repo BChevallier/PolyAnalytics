@@ -33,7 +33,7 @@ def clean_size_string(size):
 # A sloppy attempt to fix ocr artifacts.
 # Will return None if it doesn't manage to.
 def clean_type_string(type):
-    possible_types={"Continents", "Lakes", "Archipelago", "Water world", "Dryland", "Pangea"}
+    possible_types={"Continents", "Lakes", "Archipelago", "Water World", "Dryland", "Pangea"}
     if type in possible_types:
         return type
     else:
@@ -149,19 +149,19 @@ def get_techs(img):
     tech_progress="0"*(10-len(tech_progress))+tech_progress
     return tech_progress
 
-tech2tribe={
-    "0000110000": "Tr1",
-    "0011000000": "Tr2",
-    "0000000011": "Tr3",
-    "1100000000": "Tr4",
-    "0000001100": "Tr5",
-    "0000000020": "Tr6",
-    "0000000000": "Tr7",
-    "0000400000": "Tr8",
-    "0020000000": "Tr9",
-    "0000040000": "Tr10",
-    "0002000000": "Tr11",
-    "2000000000": "Tr12",
+tech2tribe = {
+    "0000110000": {"Tr1"},
+    "0011000000": {"Tr2"},
+    "0000000011": {"Tr3","Tr14"},
+    "1100000000": {"Tr4"},
+    "0000001100": {"Tr5","Tr15"},
+    "0000000020": {"Tr6"},
+    "0000000000": {"Tr7","Tr13"},
+    "0000400000": {"Tr8"},
+    "0020000000": {"Tr9","Tr16"},
+    "0000020000": {"Tr10"},
+    "0002000000": {"Tr11"},
+    "2000000000": {"Tr12"},
 }
 
 #returns Tribe corresponding to starting tech config. Can return None.
@@ -170,7 +170,7 @@ def tribe_from_tech(tech):
     if tech in tech2tribe:
         return tech2tribe[tech]
     else:
-        return None
+        return {}
 
 def get_color_from_coords(img, coords):
     """Return a list of pixel values from ``img`` at each (x, y) in ``coords``."""
