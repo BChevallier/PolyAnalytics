@@ -15,7 +15,7 @@ if __name__ == "__main__":
     window = ws.resize_window("Polytopia")
     for i in range(10):
         columns=["mType","mSize","TribeA","TribeB","1v1","Winner"]
-        batch=datahandling.takebatch(i)
+        batch=dataHandling.takebatch(i)
         #batch=["0ad7b170-68d8-496e-3fea-08dd25c45c7b"]
         df=pd.DataFrame(index=batch, columns=columns)
         for id in batch:
