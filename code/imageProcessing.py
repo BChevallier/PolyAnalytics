@@ -4,9 +4,9 @@ from PIL import ImageOps, Image
 import pytesseract
 from MacOS_specific import startReplayOnSteam
 from MacOS_specific import windowStuff as ws
-import colorProcessing as cpro
+from MacOS_specific import macInputs as inp
 import time
-
+import random
 
 #function to binarize image.
 #DOESN'T WORK
@@ -81,11 +81,14 @@ def get_menu_info(image):
 #function that crops out the economic info of a replay frame.
 #returns tuple with cropped images for current star count, and current revenue
 def get_eco_info(image):
-    cur_box=(411, 23, 437, 38)
-    rev_box =(415,9,435,21)
+    cur_box=(407, 23, 437, 38)
+    rev_box =(412,9,435,21)
     #cropped images
     cur_img=image.crop(cur_box)
     rev_img=image.crop(rev_box)
+    #greyscale
+    rev_img=ImageOps.grayscale(rev_img)
+    cur_img = ImageOps.grayscale(cur_img)
     return (rev_img,cur_img)
 
 #function to test where some coords are on an image.
@@ -186,12 +189,19 @@ def get_color_from_coords(img, coords):
 
 if __name__ == "__main__":
     #startReplayOnSteam.open_replay("bb363954-782c-4c5d-40c9-08dd25c45c7b")
-    #time.sleep(1.5)
-    id=ws.get_cgwindow_id("Polytopia")
-    frame=ws.getWindowImg(id)
-    player_color = get_color_from_coords(frame, [(9, 33)])[0]
-    tribe_by_color = cpro.identify_tribe(player_color)
-    #print(cpro.color_distance_rgb(player_color,(0,255,0)))
-    print(tribe_by_color)
-    img=test_pixel_coords(frame,(9,33))
-    img.save("Test.png")
+    time.sleep(4)
+    inp.pause_game()
+    for iter in range(60,70):
+        time.sleep(random.randint(13, 22))
+        inp.pause_game()
+        print("Pause!")
+        inp.mouse_diag_drag(120,120)
+        time.sleep(1)
+        id=ws.get_cgwindow_id("Polytopia")
+        frame=ws.getWindowImg(id)
+        revenue_img, current_stars_img = get_eco_info(frame)
+        revenue_img.save(f"OCR_training_data/revenue{iter}.png")
+        current_stars_img.save(f"OCR_training_data/currentEco{iter}.png")
+        print(f"Image {iter} saved! Start again")
+        time.sleep(2)
+        inp.pause_game()
