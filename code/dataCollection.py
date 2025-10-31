@@ -1,15 +1,22 @@
-from MacOS_specific import windowStuff as ws
 import imageProcessing as ipro
-from MacOS_specific import startReplayOnSteam
 import colorProcessing as cpro
 import dataHandling
-from MacOS_specific import macInputs as inp
 import time
 import pandas as pd
 import numpy as np
 import sys
-
-
+import os
+#check for the os you run the code on:
+if platform.system() == 'Linux'
+    from  Linux_specific import linux
+    from Linux_specific import linuxInputs as inp
+elif platform.system() == 'Darwin'
+    from MacOS_specific import windowStuff as ws
+    from MacOS_specific import startReplayOnSteam
+    from MacOS_specific import macInputs as inp
+    mac = True
+else:
+    raise Exception("something went wrong, because your os is not recognized properly")
 if __name__ == "__main__":
     win_id=ws.get_cgwindow_id("Polytopia")
     window = ws.resize_window("Polytopia")
