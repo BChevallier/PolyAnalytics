@@ -59,7 +59,7 @@ def scroll(amount):
     return None
 
 #drags mouse a few pixels diagonally to the bottom left in 10p increments
-def mouse_drag(x,y):
+def mouse_diag_drag(x,y):
     tap_location = Quartz.kCGHIDEventTap
     left_mouse_button = Quartz.kCGMouseButtonLeft
     y+=56

@@ -14,54 +14,48 @@ if __name__ == "__main__":
     win_id=ws.get_cgwindow_id("Polytopia")
     window = ws.resize_window("Polytopia")
     for i in range(10):
-        columns=["mType","mSize","TribeA","TribeB","1v1"]
+        columns=["mType","mSize","TribeA","TribeB","1v1","Winner"]
         batch=datahandling.takebatch(i)
         #batch=["0ad7b170-68d8-496e-3fea-08dd25c45c7b"]
         df=pd.DataFrame(index=batch, columns=columns)
         for id in batch:
-            #start replay
-            startReplayOnSteam.open_replay(id)
-            #activate Polytopia window
-            window.activate(win_id)
-            #wait for replay to launch
-            time.sleep(0.8)
+            startReplayOnSteam.open_replay(id) #start replay
+            window.activate(win_id) #activate Polytopia window
+            time.sleep(0.8) #wait for replay to launch
             inp.pause_game()
-            inp.mouse_drag(120,120)#move camera to avoid messy background
+            inp.mouse_diag_drag(120,120) #move camera to avoid messy background
+
             inp.mouse_click_nominal(640,430) #open menu
-            time.sleep(1.5)#very important
+            time.sleep(1.5) #very important
             frame=ws.getWindowImg(win_id) #screenshot
-            #frame.save("MenuScreenshot.png")
-            #extract maptype and mapsize
-            mSize, mType = ipro.get_menu_info(frame)
-            #print(f"mSize is {mSize}")
-            #print(f"mType is {mType}")
+            mSize, mType = ipro.get_menu_info(frame) #extract maptype and mapsize
             df.at[id, "mSize"] = mSize
             df.at[id, "mType"] = mType
             inp.press_key(53)#escape menu
+
             #see player 1
             for Player in ["A","B"]:
-                inp.press_key(18 if Player=="A" else 19)
+                inp.press_key(18 if Player=="A" else 19) #press 1 or 2
                 time.sleep(0.1)
                 frame = ws.getWindowImg(win_id)
-                #frame.save(f"Game{Player}.png")
-                player_color=ipro.get_color_from_coords(frame,[(9,33)])[0]
+                player_color=ipro.get_color_from_coords(frame,[(9,33)])[0] #[0] important because it returns a list
                 tribe_by_color=cpro.identify_tribe(player_color)
-                #print(f"Tribe by color {Player}: {tribe_by_color}")
+
                 inp.mouse_click_nominal(700,430) #open tech tree
                 time.sleep(0.1)
                 inp.scroll(-50) #zoom out
                 time.sleep(0.2)
                 frame = ws.getWindowImg(win_id) #screenshot
-                #frame.save(f"Tech{Player}.png")
                 starting_tech=ipro.get_techs(frame) #get starting techs
                 tribes_by_techs=ipro.tribe_from_tech(starting_tech) #get tribe corresponding to those techs
-                #print(f"Tribe by tech {Player}: {tribes_by_techs}")
+
                 if tribe_by_color in tribes_by_techs:
-                    df.at[id, f"Tribe{Player}"]=tribe_by_color
+                    df.at[id, f"Tribe{Player}"] = tribe_by_color
                 else:
                     df.at[id, f"Tribe{Player}"] = np.nan
-                inp.press_key(53)
+                inp.press_key(53) #press escape
                 time.sleep(0.2)
+
             inp.press_key(20)#press 3 to see if more than 2 player
             time.sleep(0.3)
             frame = ws.getWindowImg(win_id)
@@ -71,7 +65,10 @@ if __name__ == "__main__":
                 df.at[id, "1v1"] = False
             if df.loc[id].iloc[:4].isnull().all(): sys.exit()
             time.sleep(30)
-        df.to_csv(f"testing/Batch{i}.csv")
+
+            if df.at[id,"1v1"]==True:
+                ...#get winner when function is implemented
+        df.to_csv(f"collected_data/Batch{i}.csv")
         print(df)
 
 

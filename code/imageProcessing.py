@@ -102,8 +102,8 @@ def test_pixel_coords(img,coords, squareSize=50, show_color=False):
     return image.crop(box)
 
 #Looks at the exit button in a frame.
-# If the button is green the game ended and it will return True.
-# Else False.
+#If the button is green the game ended and it will return True.
+#Else False.
 def check_for_end(img):
     color=img.getpixel((740,430))
     if cp.check_if_complete(color):
