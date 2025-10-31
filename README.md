@@ -6,3 +6,13 @@ Quick access:
 - [potential next steps](./plan/potential_next_steps.md)
 
 
+## libraries you need to ----------
+### general:
+-numpy
+-pandas
+-pathlib
+### linux:
+-pynput
+- Pillow
+-pyvirtualdisplay
+- ### mac:

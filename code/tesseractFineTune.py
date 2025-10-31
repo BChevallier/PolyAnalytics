@@ -3,8 +3,5 @@
 import torch
 from pathlib import Path
 #import tesstrain
-currentdir = Path.cwd()
-oneup = currentdir.parents
-pathoftrainingdata = oneup / " OCR_training_data"
+print((Path(file).resolve().parents[1] / "ocr_training" / "data").resolve())
 
-print(pathoftrainingdata)
