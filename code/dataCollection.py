@@ -2,7 +2,7 @@ from MacOS_specific import windowStuff as ws
 import imageProcessing as ipro
 from MacOS_specific import startReplayOnSteam
 import colorProcessing as cpro
-import datahandling
+import dataHandling
 from MacOS_specific import macInputs as inp
 import time
 import pandas as pd
