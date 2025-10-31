@@ -189,19 +189,5 @@ def get_color_from_coords(img, coords):
 
 if __name__ == "__main__":
     #startReplayOnSteam.open_replay("bb363954-782c-4c5d-40c9-08dd25c45c7b")
-    time.sleep(4)
-    inp.pause_game()
-    for iter in range(60,70):
-        time.sleep(random.randint(13, 22))
-        inp.pause_game()
-        print("Pause!")
-        inp.mouse_diag_drag(120,120)
-        time.sleep(1)
-        id=ws.get_cgwindow_id("Polytopia")
-        frame=ws.getWindowImg(id)
-        revenue_img, current_stars_img = get_eco_info(frame)
-        revenue_img.save(f"OCR_training_data/revenue{iter}.png")
-        current_stars_img.save(f"OCR_training_data/currentEco{iter}.png")
-        print(f"Image {iter} saved! Start again")
-        time.sleep(2)
-        inp.pause_game()
+    id=ws.get_cgwindow_id("Polytopia")
+    frame=ws.getWindowImg(id)

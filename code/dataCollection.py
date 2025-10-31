@@ -13,7 +13,7 @@ import sys
 if __name__ == "__main__":
     win_id=ws.get_cgwindow_id("Polytopia")
     window = ws.resize_window("Polytopia")
-    for i in range(10):
+    for i in range(1,2):
         columns=["mType","mSize","TribeA","TribeB","1v1","Winner"]
         batch=dataHandling.takebatch(i)
         #batch=["0ad7b170-68d8-496e-3fea-08dd25c45c7b"]
@@ -25,6 +25,7 @@ if __name__ == "__main__":
             inp.pause_game()
             inp.mouse_diag_drag(120,120) #move camera to avoid messy background
 
+            print("Getting menu infos")
             inp.mouse_click_nominal(640,430) #open menu
             time.sleep(1.5) #very important
             frame=ws.getWindowImg(win_id) #screenshot
@@ -33,8 +34,9 @@ if __name__ == "__main__":
             df.at[id, "mType"] = mType
             inp.press_key(53)#escape menu
 
-            #see player 1
+            #identify Tribes
             for Player in ["A","B"]:
+                print(f"Identifying tribe of Player {Player}")
                 inp.press_key(18 if Player=="A" else 19) #press 1 or 2
                 time.sleep(0.1)
                 frame = ws.getWindowImg(win_id)
@@ -51,39 +53,41 @@ if __name__ == "__main__":
 
                 if tribe_by_color in tribes_by_techs:
                     df.at[id, f"Tribe{Player}"] = tribe_by_color
+                    print(f"Player {Player} has color: {player_color}")
                 else:
                     df.at[id, f"Tribe{Player}"] = np.nan
                 inp.press_key(53) #press escape
                 time.sleep(0.2)
-
-            inp.press_key(20)#press 3 to see if more than 2 player
-            time.sleep(0.3)
+            inp.press_key(20)#press 3 to see if there is a third player
+            time.sleep(0.2)
             frame = ws.getWindowImg(win_id)
             if ipro.get_color_from_coords(frame,[(9,33)])[0]==player_color:
                 df.at[id, "1v1"] = True
             else:
                 df.at[id, "1v1"] = False
-            if df.loc[id].iloc[:4].isnull().all(): sys.exit()
-            time.sleep(30)
-
+            if df.loc[id].iloc[:4].isnull().all(): sys.exit(f"Got for None values in a row at id{id}")
+            #winner detection for 1v1 games
             if df.at[id,"1v1"]==True:
-                ...#get winner when function is implemented
+                inp.press_key(29)
+                counter=0
+                is_at_end = False
+                print("Scrolling to the end")
+                while not is_at_end: #scroll to the end
+                    counter+=1
+                    inp.move_turn_bar()
+                    time.sleep(0.5)
+                    frame=ws.getWindowImg(win_id)
+                    is_at_end=ipro.check_for_end(frame)
+                    time.sleep(0.5)
+                    if counter==40: sys.exit("Scrolled 40 times without finding the end")
+                color_at_end=ipro.get_color_from_coords(frame, [(9,33)])[:3][0]
+                print(f"Color at end is:{color_at_end}")
+                if color_at_end == player_color:
+                    df.at[id,"Winner"]="B"
+                else:
+                    print(f"Seen color: {ipro.get_color_from_coords(frame, [(740,430)])[:3]}")
+                    print(f"Saved Color for Player B: {player_color}")
+                    df.at[id, "Winner"]="A"
+            time.sleep(8)
         df.to_csv(f"collected_data/Batch{i}.csv")
         print(df)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
