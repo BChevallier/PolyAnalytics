@@ -94,8 +94,41 @@ def mouse_diag_drag(x,y):
     )
     Quartz.CGEventPost(tap_location, mouse_up)
 
-
+def move_turn_bar():
+    turn_bar_height=128
+    tap_location = Quartz.kCGHIDEventTap
+    left_mouse_button = Quartz.kCGMouseButtonLeft
+    # Adjust y coordinates for macOS bottom-left origin if needed here
+    # (Add your coordinate conversion if coordinates are top-left origin)
+    # Create and post mouse down event at start coordinates
+    mouse_down = Quartz.CGEventCreateMouseEvent(
+        None,
+        Quartz.kCGEventLeftMouseDown,
+        (790,turn_bar_height),
+        left_mouse_button
+    )
+    Quartz.CGEventPost(tap_location, mouse_down)
+    # Slight pause to imitate realistic drag timing
+    time.sleep(0.5)
+    for i in range(0,700,140):
+        # Create and post mouse dragged event at end coordinates
+        mouse_drag = Quartz.CGEventCreateMouseEvent(
+            None,
+            Quartz.kCGEventLeftMouseDragged,
+            (790-i, turn_bar_height),
+            left_mouse_button
+        )
+        Quartz.CGEventPost(tap_location, mouse_drag)
+        time.sleep(0.1)
+    # Create and post mouse up event at end coordinates (release)
+    mouse_up = Quartz.CGEventCreateMouseEvent(
+        None,
+        Quartz.kCGEventLeftMouseUp,
+        (90, turn_bar_height),
+        left_mouse_button
+    )
+    Quartz.CGEventPost(tap_location, mouse_up)
 
 if __name__=="__main__":
-    time.sleep(3)
-    mouse_drag(120,120)
+    time.sleep(6)
+    move_turn_bar()
