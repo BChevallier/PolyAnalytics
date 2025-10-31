@@ -59,7 +59,7 @@ def get_menu_info(image):
     size_img=image.crop(size_box)
     type_img=image.crop(type_box)
     #greyscale images
-    gray_size_img=ImageOps.grayscale(size_img)
+    gray_size_img = ImageOps.grayscale(size_img)
     gray_type_img = ImageOps.grayscale(type_img)
     #invert image
     # (Works better because pytesseract was trained on black text on white mostly)
