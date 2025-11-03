@@ -11,24 +11,40 @@ import pyscreenshot as ImageGrap
 # config:
 WIDTH = 800
 HEIGHT= 500
-USE_VIRTUALGL = firefox_headless
+URL = "https://archlinux.org"
+OUTFILE = "firefox_headless.png"
 STEAM_APPID = 874390 # app id for polytopia
 STEAM_CMD ="steam"
-def start_display():
+def main():
+    # Start a virtual X display (Xvfb). visible=False means headless.
+    with Display(visible=False, size=(WIDTH, HEIGHT), color_depth=24) as disp:
+        # pyvirtualdisplay sets DISPLAY in os.environ automatically
+        print(f"DISPLAY set to {os.environ.get('DISPLAY')}")
 
-    dis = Display(visible=0, size=(WIDTH, HEIGHT), color_depth=24)
-    dis.start()
+        # Launch Firefox into the virtual display
+        p = subprocess.Popen(
+            ["firefox", "--no-remote", "--new-instance", URL],
+            env=os.environ
+        )
 
-    os.environ.get["DISPLAY"] =dis.display
-    return dis
+        try:
+            # Give Firefox time to start and render
+            # First launch can take longer; adjust as needed
+            time.sleep(10)
 
-p = subprocess.Popen(["firefox", "--no-remote", "--new-instance", "https://archlinux.org/"], env=os.environ)
+            # Take a screenshot of the root window
+            # You can pass bbox=(0, 0, WIDTH, HEIGHT) if you want to constrain
+            img = ImageGrap.grab()  # grabs from current DISPLAY
+            img = img.crop((0, 0, WIDTH, HEIGHT))  # ensure exact size
+            img.save(OUTFILE)
+            print(f"Saved screenshot to {OUTFILE}")
+        finally:
+            # Terminate Firefox and wait briefly
+            p.terminate()
+            try:
+                p.wait(timeout=5)
+            except Exception:
+                p.kill()
 
-
-time.sleep(20)
-img = ImageGrap.grab()
-img.save("firefox_headless.png")
-print("It works now yay")
-
-p.terminate()
-display.stop()
+if __name__ == "__main__":
+    main()
