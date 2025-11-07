@@ -8,10 +8,10 @@ import sys
 import os
 from MacOS_specific import startReplayOnSteam
 #check for the os you run the code on:
-if platform.system() == 'Linux'
+if os.platform.system() == 'Linux'
     from  Linux_specific import linux
     from Linux_specific import linuxInputs as inp
-elif platform.system() == 'Darwin'
+elif os.platform.system() == 'Darwin'
     from MacOS_specific import windowStuff as ws
     from MacOS_specific import macInputs as inp
     mac = True
