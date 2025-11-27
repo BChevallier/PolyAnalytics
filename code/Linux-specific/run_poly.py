@@ -83,14 +83,20 @@ def main():
         wm = start_wm()
         time.sleep(1.0)
 
-        # Launch the game by AppID; this will start Steam if needed
-        steam_cmd = ["steam", "-silent", "-applaunch", str(STEAM_APPID)]
+        # Launch the game
+        # We redirect output to a file to prevent buffer issues and keep terminal clean
+        steam_log = open("steam_run.log", "w")
+        
         if REPLAY_ID:
             print(f"Launching Replay: {REPLAY_ID}")
-            # The argument format "opengame?id=UUID" tells Polytopia to open the replay
-            steam_cmd.append(f"opengame?id={REPLAY_ID}")
+            # Try using the steam:// URL format which is often more robust for passing args
+            # and avoids issues with how -applaunch parses arguments
+            steam_url = f"steam://run/{STEAM_APPID}//opengame?id={REPLAY_ID}"
+            steam_cmd = ["steam", "-silent", steam_url]
+        else:
+            steam_cmd = ["steam", "-silent", "-applaunch", str(STEAM_APPID)]
 
-        p = subprocess.Popen(steam_cmd, env=env)
+        p = subprocess.Popen(steam_cmd, env=env, stdout=steam_log, stderr=steam_log)
 
         try:
             print("Waiting for game window...")
@@ -131,6 +137,9 @@ def main():
                 p.wait(timeout=10)
             except Exception:
                 p.kill()
+            
+            if steam_log:
+                steam_log.close()
 
             wm.terminate()
             try:
