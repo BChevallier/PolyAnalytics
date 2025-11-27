@@ -17,7 +17,7 @@ SW_RENDER_ENV = {
     "LIBGL_ALWAYS_SOFTWARE": "1",
     "MESA_LOADER_DRIVER_OVERRIDE": "llvmpipe",
     "SDL_VIDEODRIVER": "x11",
-    "DISPLAY": ":0" # Will be overwritten by Display
+    "LIBGL_DEBUG": "verbose"
 }
 
 def ensure_dir(path):
@@ -67,8 +67,8 @@ def main():
     with Display(visible=False, size=(WIDTH, HEIGHT), color_depth=24) as disp:
         env = os.environ.copy()
         env.update(SW_RENDER_ENV)
-        # pyvirtualdisplay sets the DISPLAY variable in os.environ, but we ensure it's passed
-        log(f"DISPLAY is {os.environ.get('DISPLAY')}")
+        # pyvirtualdisplay sets the DISPLAY variable in os.environ
+        log(f"DISPLAY passed to subprocess: {env.get('DISPLAY')}")
 
         # 2. Start Window Manager (Openbox)
         # Games often fail to render if there is no WM to handle the window creation
