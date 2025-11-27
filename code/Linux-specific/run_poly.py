@@ -1,158 +1,120 @@
-from pyvirtualdisplay import Display
-import subprocess
-import time
 import os
-import shlex
+import time
+import subprocess
+import psutil
+import pyscreenshot as ImageGrab
+from pyvirtualdisplay import Display
 
-# Configure your virtual screen
+# Configuration
 WIDTH = 1280
 HEIGHT = 800
-COLOR_DEPTH = 24
-
-# Your game AppID (example: Polytopia)
-STEAM_APPID = 874390
-# Optional: Replay ID to launch directly (set to None for normal game)
-# Example: "7fd4ddbf-028b-49a3-4071-08dd25c45c7b"
+STEAM_APPID = 874390  # Polytopia
 REPLAY_ID = "7fd4ddbf-028b-49a3-4071-08dd25c45c7b"
+LOG_FILE = "steam_run.log"
+SCREENSHOT_DIR = "debug_screenshots"
 
-# Environment to make rendering work under Xvfb (no GPU)
+# Environment for software rendering
 SW_RENDER_ENV = {
     "LIBGL_ALWAYS_SOFTWARE": "1",
     "MESA_LOADER_DRIVER_OVERRIDE": "llvmpipe",
     "SDL_VIDEODRIVER": "x11",
-    "LIBGL_DEBUG": "verbose",
+    "LIBGL_DEBUG": "verbose"
 }
 
-def start_wm():
-    # Lightweight window manager so apps aren't stuck at 0,0 tiny
-    return subprocess.Popen(
-        ["openbox"],
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.STDOUT,
-        env=os.environ.copy(),
-    )
+def ensure_dir(path):
+    if not os.path.exists(path):
+        os.makedirs(path)
 
-def screenshot_root(outfile="steam_game.png"):
-    # Use xwd + ImageMagick convert for reliable Xvfb screenshots
-    cmd = f'xwd -root -silent | convert xwd:- png:{shlex.quote(outfile)}'
-    subprocess.run(["bash", "-lc", cmd], check=True, env=os.environ.copy())
-    return outfile
-def screenshot_window_by_name(name_pattern, outfile="polytopia.png"):
-    # Find window id
-    wid = subprocess.check_output(
-        ["xdotool", "search", "--onlyvisible", "--name", name_pattern],
-        stderr=subprocess.STDOUT,
-    ).decode().strip().splitlines()[-1]
-    cmd = f'xwd -id {shlex.quote(wid)} -silent | convert xwd:- png:{shlex.quote(outfile)}'
-    subprocess.run(["bash", "-lc", cmd], check=True, env=os.environ.copy())
-    return outfile
-def maximize_or_resize(name_pattern, w=WIDTH, h=HEIGHT):
-    # Try to maximize via WM; fallback to explicit geometry
-    try:
-        subprocess.run(
-            ["wmctrl", "-r", name_pattern, "-b", "add,maximized_vert,maximized_horz"],
-            check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
-        )
-        return
-    except subprocess.CalledProcessError:
-        pass
-    try:
-        wid = subprocess.check_output(
-            ["xdotool", "search", "--onlyvisible", "--name", name_pattern],
-            stderr=subprocess.STDOUT,
-        ).decode().strip().splitlines()[-1]
-        subprocess.run(["xdotool", "windowsize", wid, str(w), str(h)], check=False)
-        subprocess.run(["xdotool", "windowmove", wid, "0", "0"], check=False)
-    except subprocess.CalledProcessError:
-        pass
+def log(message):
+    print(f"[{time.strftime('%H:%M:%S')}] {message}")
+    with open(LOG_FILE, "a") as f:
+        f.write(f"[{time.strftime('%H:%M:%S')}] {message}\n")
 
+def check_processes():
+    """Check if Steam or the Game is running."""
+    steam_running = False
+    game_running = False
+    # Polytopia's binary name on Linux is usually 'Polytopia' or 'Polytopia.x86_64'
+    game_names = ["Polytopia", "Polytopia.x86_64", "Polytopia.exe"]
+    
+    for proc in psutil.process_iter(['pid', 'name', 'cmdline']):
+        try:
+            name = proc.info['name']
+            if "steam" in name.lower():
+                steam_running = True
+            
+            if name in game_names:
+                game_running = True
+                log(f"FOUND GAME PROCESS: {name} (PID: {proc.info['pid']})")
+        except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
+            pass
+    return steam_running, game_running
+
+def take_screenshot(name):
+    try:
+        filename = os.path.join(SCREENSHOT_DIR, f"{name}.png")
+        img = ImageGrab.grab(bbox=(0, 0, WIDTH, HEIGHT))
+        img.save(filename)
+        log(f"Screenshot saved: {filename}")
+    except Exception as e:
+        log(f"Failed to take screenshot: {e}")
 
 def main():
-    env = os.environ.copy()
-    env.update(SW_RENDER_ENV)
-      #game_flags = [
-        #"-windowed",
-        #"-noborder",
-        #"-screen-fullscreen", "0",
-        #"-screen-width", str(WIDTH),
-        #"-screen-height", str(HEIGHT),
-    #]
-    # Start virtual display
-    with Display(visible=False, size=(WIDTH, HEIGHT), color_depth=COLOR_DEPTH) as disp:
-        print(f"DISPLAY set to {os.environ.get('DISPLAY')}")
-        wm = start_wm()
-        time.sleep(1.0)
+    ensure_dir(SCREENSHOT_DIR)
+    # Clear old log
+    with open(LOG_FILE, "w") as f: f.write("Starting Run Session\n")
 
-        # 3. Launch Steam (Client only first)
-        # This ensures the Steam runtime is loaded before we try to launch the game
-        print("Starting Steam client...")
-        steam_log = open("steam_run.log", "w")
-        steam_proc = subprocess.Popen(["steam", "-silent"], env=env, stdout=steam_log, stderr=steam_log)
+    # 1. Start Virtual Display
+    log("Starting Xvfb...")
+    with Display(visible=False, size=(WIDTH, HEIGHT), color_depth=24) as disp:
+        env = os.environ.copy()
+        env.update(SW_RENDER_ENV)
+        # pyvirtualdisplay sets the DISPLAY variable in os.environ
+        log(f"DISPLAY passed to subprocess: {env.get('DISPLAY')}")
+
+        # 2. Start Window Manager (Openbox)
+        log("Starting Openbox...")
+        wm = subprocess.Popen(["openbox"], env=env, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        time.sleep(2)
+
+        # 3. Launch Steam with Replay
+        log(f"Launching Steam with Replay ID {REPLAY_ID}...")
         
-        # Wait for Steam to initialize
-        time.sleep(15)
+        # Use steam:// protocol to avoid argument parsing crashes
+        steam_cmd = ["steam", f"steam://run/{STEAM_APPID}//opengame?id={REPLAY_ID}"]
+        
+        # Open a file for steam stdout/stderr
+        steam_out = open("steam_output.txt", "w")
+        p = subprocess.Popen(steam_cmd, env=env, stdout=steam_out, stderr=steam_out)
 
-        # 4. Launch Game / Replay
-        print(f"Launching Polytopia (Replay: {REPLAY_ID if REPLAY_ID else 'No'})...")
-        if REPLAY_ID:
-            # Use steam:// protocol which is robust when Steam is already running
-            launch_cmd = ["steam", "-silent", f"steam://run/{STEAM_APPID}//opengame?id={REPLAY_ID}"]
-        else:
-            launch_cmd = ["steam", "-silent", "-applaunch", str(STEAM_APPID)]
+        # 4. Monitor Loop
+        # We will loop for 2 minutes, taking screenshots and checking processes
+        max_retries = 24 # 24 * 5 seconds = 120 seconds
+        for i in range(max_retries):
+            time.sleep(5)
+            steam_active, game_active = check_processes()
             
-        # We don't need to keep track of this process, it just signals the main Steam instance
-        subprocess.Popen(launch_cmd, env=env, stdout=steam_log, stderr=steam_log)
+            status = f"Steam: {'UP' if steam_active else 'DOWN'}, Game: {'UP' if game_active else 'DOWN'}"
+            log(f"Loop {i+1}/{max_retries}: {status}")
+            
+            take_screenshot(f"step_{i:02d}_{'game' if game_active else 'wait'}")
 
+            if not steam_active and i > 5:
+                log("Steam process seems to have died.")
+                break
+
+        # Cleanup
+        log("Stopping Steam...")
+        p.terminate()
         try:
-            print("Waiting for game window...")
-            window_pattern = "Polytopia"
-            
-            # Wait up to 120s for window
-            found = False
-            for i in range(60):
-                # Check if Steam client is still alive
-                if steam_proc.poll() is not None:
-                    print("Steam client exited prematurely!")
-                    break
-                
-                try:
-                    subprocess.check_call(["xdotool", "search", "--onlyvisible", "--name", window_pattern], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-                    found = True
-                    break
-                except subprocess.CalledProcessError:
-                    time.sleep(2)
-            
-            if not found:
-                print("Game window not found (or Steam crashed).")
-                # Take a debug screenshot of whatever is there
-                screenshot_root("debug_crash.png")
-                return
-
-            print("Game window found!")
-            time.sleep(5) # Wait for it to fully render
-            maximize_or_resize(window_pattern, WIDTH, HEIGHT)
-            # Optional: grab a screenshot of the virtual desktop
-            time.sleep(1.0)
-            out_name = "replay.png" if REPLAY_ID else "polytopia.png"
-            screenshot_window_by_name(window_pattern, out_name)
-            print(f"Saved screenshot to {out_name}")
-        finally:
-            # Try to clean up the game/Steam and WM
-            if steam_proc:
-                steam_proc.terminate()
-                try:
-                    steam_proc.wait(timeout=10)
-                except Exception:
-                    steam_proc.kill()
-            
-            if steam_log:
-                steam_log.close()
-
-            wm.terminate()
-            try:
-                wm.wait(timeout=5)
-            except Exception:
-                wm.kill()
+            p.wait(timeout=10)
+        except:
+            p.kill()
+        
+        steam_out.close()
+        
+        log("Stopping WM...")
+        wm.terminate()
 
 if __name__ == "__main__":
     main()
