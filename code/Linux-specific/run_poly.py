@@ -11,20 +11,16 @@ COLOR_DEPTH = 24
 
 # Your game AppID (example: Polytopia)
 STEAM_APPID = 874390
+# Optional: Replay ID to launch directly (set to None for normal game)
+# Example: "7fd4ddbf-028b-49a3-4071-08dd25c45c7b"
+REPLAY_ID = "7fd4ddbf-028b-49a3-4071-08dd25c45c7b"
 
 # Environment to make rendering work under Xvfb (no GPU)
 SW_RENDER_ENV = {
     "LIBGL_ALWAYS_SOFTWARE": "1",
     "MESA_LOADER_DRIVER_OVERRIDE": "llvmpipe",
-    "__GLX_VENDOR_LIBRARY_NAME": "mesa",
-    "GDK_BACKEND": "x11",
-    "QT_QPA_PLATFORM": "xcb",
     "SDL_VIDEODRIVER": "x11",
     "SDL_AUDIODRIVER": "dummy",
-    # If the game is Windows-only via Proton and you have no Vulkan, prefer OpenGL:
-    # "PROTON_USE_WINED3D": "1",
-    # If you want software Vulkan (very slow), point to lavapipe ICD (path may vary):
-    # "VK_ICD_FILENAMES": "/usr/share/vulkan/icd.d/lvp_icd.x86_64.json",
 }
 
 def start_wm():
@@ -88,17 +84,26 @@ def main():
         time.sleep(1.0)
 
         # Launch the game by AppID; this will start Steam if needed
-        p = subprocess.Popen(["steam", "-applaunch", str(STEAM_APPID)], env=env)
+        steam_cmd = ["steam", "-applaunch", str(STEAM_APPID)]
+        if REPLAY_ID:
+            print(f"Launching Replay: {REPLAY_ID}")
+            # The argument format "opengame?id=UUID" tells Polytopia to open the replay
+            steam_cmd.append(f"opengame?id={REPLAY_ID}")
+
+        p = subprocess.Popen(steam_cmd, env=env)
 
         try:
             # First launch can take a while (updates, Proton setup, etc.)
-            time.sleep(40)
+            # Debugging showed it takes ~55s to appear
+            print("Waiting 90 seconds for game to launch...")
+            time.sleep(90)
             window_pattern ="Polytopia"
             maximize_or_resize(window_pattern, WIDTH, HEIGHT)
             # Optional: grab a screenshot of the virtual desktop
             time.sleep(1.0)
-            screenshot_window_by_name(window_pattern, "polytopia.png")
-            print("Saved screenshot to steam_game.png")
+            out_name = "replay.png" if REPLAY_ID else "polytopia.png"
+            screenshot_window_by_name(window_pattern, out_name)
+            print(f"Saved screenshot to {out_name}")
         finally:
             # Try to clean up the game/Steam and WM
             p.terminate()

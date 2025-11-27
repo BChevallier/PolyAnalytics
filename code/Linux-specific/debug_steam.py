@@ -41,6 +41,11 @@ def check_processes():
             name = proc.info['name']
             if "steam" in name.lower():
                 steam_running = True
+            
+            # Debug: Print any process that looks like it might be the game
+            if "poly" in name.lower():
+                log(f"POTENTIAL GAME PROCESS: {name} (PID: {proc.info['pid']})")
+
             if name in game_names:
                 game_running = True
                 log(f"FOUND GAME PROCESS: {name} (PID: {proc.info['pid']})")
