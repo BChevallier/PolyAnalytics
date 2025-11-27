@@ -50,6 +50,7 @@ def clean_type_string(type):
 
 #returns the cropped out info about maptype and mapsize in a tuple.
 #iput has to be 800x500 PIL Image object.
+# todo: expand to include the current game_mode
 def get_menu_info(image):
     #cropbox for mapsize
     size_box = (330, 122, 360, 136)

@@ -11,6 +11,6 @@ def open_replay(id):
 if __name__=="__main__":
     time.sleep(5)
     print("Go!")
-    #open_replay("7fd4ddbf-028b-49a3-4071-08dd25c45c7b")
+    open_replay("7fd4ddbf-028b-49a3-4071-08dd25c45c7b")
 
 #open steam://run/874390//opengame?id=0ad7b170-68d8-496e-3fea-08dd25c45c7b

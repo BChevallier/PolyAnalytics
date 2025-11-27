@@ -1,4 +1,4 @@
-# Replay controls and coordinates
+ Replay controls and coordinates
 ## Controls
 
 | Key     | Effect                         |
