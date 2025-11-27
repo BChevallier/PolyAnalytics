@@ -20,7 +20,7 @@ SW_RENDER_ENV = {
     "LIBGL_ALWAYS_SOFTWARE": "1",
     "MESA_LOADER_DRIVER_OVERRIDE": "llvmpipe",
     "SDL_VIDEODRIVER": "x11",
-    "SDL_AUDIODRIVER": "dummy",
+    "LIBGL_DEBUG": "verbose",
 }
 
 def start_wm():
@@ -84,7 +84,7 @@ def main():
         time.sleep(1.0)
 
         # Launch the game by AppID; this will start Steam if needed
-        steam_cmd = ["steam", "-applaunch", str(STEAM_APPID)]
+        steam_cmd = ["steam", "-silent", "-applaunch", str(STEAM_APPID)]
         if REPLAY_ID:
             print(f"Launching Replay: {REPLAY_ID}")
             # The argument format "opengame?id=UUID" tells Polytopia to open the replay
@@ -93,11 +93,31 @@ def main():
         p = subprocess.Popen(steam_cmd, env=env)
 
         try:
-            # First launch can take a while (updates, Proton setup, etc.)
-            # Debugging showed it takes ~55s to appear
-            print("Waiting 90 seconds for game to launch...")
-            time.sleep(90)
-            window_pattern ="Polytopia"
+            print("Waiting for game window...")
+            window_pattern = "Polytopia"
+            
+            # Wait up to 120s for window
+            found = False
+            for i in range(60):
+                if p.poll() is not None:
+                    print("Steam process exited prematurely!")
+                    break
+                
+                try:
+                    subprocess.check_call(["xdotool", "search", "--onlyvisible", "--name", window_pattern], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                    found = True
+                    break
+                except subprocess.CalledProcessError:
+                    time.sleep(2)
+            
+            if not found:
+                print("Game window not found (or Steam crashed).")
+                # Take a debug screenshot of whatever is there
+                screenshot_root("debug_crash.png")
+                return
+
+            print("Game window found!")
+            time.sleep(5) # Wait for it to fully render
             maximize_or_resize(window_pattern, WIDTH, HEIGHT)
             # Optional: grab a screenshot of the virtual desktop
             time.sleep(1.0)
