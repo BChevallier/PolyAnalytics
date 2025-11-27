@@ -83,20 +83,25 @@ def main():
         wm = start_wm()
         time.sleep(1.0)
 
-        # Launch the game
-        # We redirect output to a file to prevent buffer issues and keep terminal clean
+        # 3. Launch Steam (Client only first)
+        # This ensures the Steam runtime is loaded before we try to launch the game
+        print("Starting Steam client...")
         steam_log = open("steam_run.log", "w")
+        steam_proc = subprocess.Popen(["steam", "-silent"], env=env, stdout=steam_log, stderr=steam_log)
         
-        if REPLAY_ID:
-            print(f"Launching Replay: {REPLAY_ID}")
-            # Try using the steam:// URL format which is often more robust for passing args
-            # and avoids issues with how -applaunch parses arguments
-            steam_url = f"steam://run/{STEAM_APPID}//opengame?id={REPLAY_ID}"
-            steam_cmd = ["steam", "-silent", steam_url]
-        else:
-            steam_cmd = ["steam", "-silent", "-applaunch", str(STEAM_APPID)]
+        # Wait for Steam to initialize
+        time.sleep(15)
 
-        p = subprocess.Popen(steam_cmd, env=env, stdout=steam_log, stderr=steam_log)
+        # 4. Launch Game / Replay
+        print(f"Launching Polytopia (Replay: {REPLAY_ID if REPLAY_ID else 'No'})...")
+        if REPLAY_ID:
+            # Use steam:// protocol which is robust when Steam is already running
+            launch_cmd = ["steam", "-silent", f"steam://run/{STEAM_APPID}//opengame?id={REPLAY_ID}"]
+        else:
+            launch_cmd = ["steam", "-silent", "-applaunch", str(STEAM_APPID)]
+            
+        # We don't need to keep track of this process, it just signals the main Steam instance
+        subprocess.Popen(launch_cmd, env=env, stdout=steam_log, stderr=steam_log)
 
         try:
             print("Waiting for game window...")
@@ -105,8 +110,9 @@ def main():
             # Wait up to 120s for window
             found = False
             for i in range(60):
-                if p.poll() is not None:
-                    print("Steam process exited prematurely!")
+                # Check if Steam client is still alive
+                if steam_proc.poll() is not None:
+                    print("Steam client exited prematurely!")
                     break
                 
                 try:
@@ -132,11 +138,12 @@ def main():
             print(f"Saved screenshot to {out_name}")
         finally:
             # Try to clean up the game/Steam and WM
-            p.terminate()
-            try:
-                p.wait(timeout=10)
-            except Exception:
-                p.kill()
+            if steam_proc:
+                steam_proc.terminate()
+                try:
+                    steam_proc.wait(timeout=10)
+                except Exception:
+                    steam_proc.kill()
             
             if steam_log:
                 steam_log.close()
