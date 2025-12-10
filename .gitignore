@@ -1,0 +1,5 @@
+#here you can ignore some documents:
+
+*.txt
+*.log
+*./code/Linux-specific/INPUT_METHODS.md
