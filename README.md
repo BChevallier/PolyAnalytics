@@ -1,6 +1,8 @@
 # PolyAnalytics
 Applying some statistical methods to discover patterns in Polytopia 1v1 replays.
 
+Built together with Paul Sibila ([@Hkwln](https://github.com/Hkwln)).
+
 **Status: paused.** The replay IDs in `data/1v1replays.csv` are no longer valid, so no new games can be opened. The pipeline collected one batch of 10 games (`code/collected_data/Batch1.csv`).
 
 Quick access:
