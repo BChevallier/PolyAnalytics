@@ -2,11 +2,6 @@ import colorProcessing as cp
 import numpy as np
 from PIL import ImageOps, Image
 import pytesseract
-from MacOS_specific import startReplayOnSteam
-from MacOS_specific import windowStuff as ws
-from MacOS_specific import macInputs as inp
-import time
-import random
 
 #function to binarize image.
 #DOESN'T WORK
@@ -43,7 +38,8 @@ def clean_type_string(type):
         return type
     else:
         for p_type in possible_types:
-            if p_type in type:
+            #compare without spaces: the OCR whitelist only allows letters ("Water World" -> "WaterWorld")
+            if p_type.replace(" ", "") in type.replace(" ", ""):
                 return p_type
         return None
 
@@ -75,7 +71,7 @@ def get_menu_info(image):
     clean_size = clean_size_string(size.replace('\n', '').strip())
 
     config = r'--psm 7 -c tessedit_char_whitelist=abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
-    type=pytesseract.image_to_string(inv_type_img)
+    type=pytesseract.image_to_string(inv_type_img, config=config)
     clean_type = clean_type_string(type.replace('\n', '').strip())
     return (clean_size, clean_type)
 
@@ -189,6 +185,7 @@ def get_color_from_coords(img, coords):
     return color_list
 
 if __name__ == "__main__":
+    from MacOS_specific import windowStuff as ws
     #startReplayOnSteam.open_replay("bb363954-782c-4c5d-40c9-08dd25c45c7b")
     id=ws.get_cgwindow_id("Polytopia")
     frame=ws.getWindowImg(id)

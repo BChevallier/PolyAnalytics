@@ -5,26 +5,25 @@ import time
 import pandas as pd
 import numpy as np
 import sys
-import os
-from MacOS_specific import startReplayOnSteam
-#check for the os you run the code on:
-if os.platform.system() == 'Linux':
-    from  Linux_specific import linux
-    from Linux_specific import linuxInputs as inp
-elif os.platform.system() == 'Darwin':
+import platform
+#this script drives the macOS app. On Linux use run_poly_fixed.py (virtual display) instead.
+if platform.system() == 'Darwin':
+    from MacOS_specific import startReplayOnSteam
     from MacOS_specific import windowStuff as ws
     from MacOS_specific import macInputs as inp
-    mac = True
+elif platform.system() == 'Linux':
+    sys.exit("dataCollection.py only works on macOS. On Linux run run_poly_fixed.py instead.")
 else:
     raise Exception("something went wrong, because your os is not recognized properly")
 if __name__ == "__main__":
     win_id=ws.get_cgwindow_id("Polytopia")
     window = ws.resize_window("Polytopia")
-    for i in range(1,2):
+    for i in range(1,2): #batch number = row of data/out.csv (0-based); Batch1.csv holds row 1
         columns=["mType","mSize","TribeA","TribeB","1v1","Winner"]
         batch=dataHandling.takebatch(i)
         #batch=["0ad7b170-68d8-496e-3fea-08dd25c45c7b"]
         df=pd.DataFrame(index=batch, columns=columns)
+        player_colors = {}
         for id in batch:
             startReplayOnSteam.open_replay(id) #start replay
             window.activate(win_id) #activate Polytopia window
@@ -48,6 +47,7 @@ if __name__ == "__main__":
                 time.sleep(0.1)
                 frame = ws.getWindowImg(win_id)
                 player_color=ipro.get_color_from_coords(frame,[(9,33)])[0] #[0] important because it returns a list
+                player_colors[Player]=player_color
                 tribe_by_color=cpro.identify_tribe(player_color)
 
                 inp.mouse_click_nominal(700,430) #open tech tree
@@ -68,7 +68,7 @@ if __name__ == "__main__":
             inp.press_key(20)#press 3 to see if there is a third player
             time.sleep(0.2)
             frame = ws.getWindowImg(win_id)
-            if ipro.get_color_from_coords(frame,[(9,33)])[0]==player_color:
+            if cpro.colors_are_similar(ipro.get_color_from_coords(frame,[(9,33)])[0], player_colors["B"]):
                 df.at[id, "1v1"] = True
             else:
                 df.at[id, "1v1"] = False
@@ -89,12 +89,13 @@ if __name__ == "__main__":
                     if counter==40: sys.exit("Scrolled 40 times without finding the end")
                 color_at_end=ipro.get_color_from_coords(frame, [(9,33)])[:3][0]
                 print(f"Color at end is:{color_at_end}")
-                if color_at_end == player_color:
+                if cpro.colors_are_similar(color_at_end, player_colors["B"]):
                     df.at[id,"Winner"]="B"
-                else:
-                    print(f"Seen color: {ipro.get_color_from_coords(frame, [(740,430)])[:3]}")
-                    print(f"Saved Color for Player B: {player_color}")
+                elif cpro.colors_are_similar(color_at_end, player_colors["A"]):
                     df.at[id, "Winner"]="A"
+                else: #matches neither player: leave the winner empty instead of guessing
+                    print(f"Color at end matches neither player (A: {player_colors['A']}, B: {player_colors['B']})")
+            df.to_csv(f"collected_data/Batch{i}.csv") #save after every game, so a crash doesn't lose the batch
             time.sleep(8)
         df.to_csv(f"collected_data/Batch{i}.csv")
         print(df)

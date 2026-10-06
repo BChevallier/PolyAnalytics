@@ -24,14 +24,14 @@ def read_ids(path: path, delimiter=',') -> list[str]:
                     ids.append(cell)
     return ids
 #change from 'list' of ids dataset with following batching:
-# 10 rows x 100 column
+# 1000 rows (batches) x 10 columns (ids per batch)
 def batch_ids():
     ids = read_ids(path)
 
     arr = np.array(ids, dtype=object).reshape((1000, 10))
     df = pd.DataFrame(arr)
-    df.to_csv('out.csv', index=False, header=False)
-    return batch
+    df.to_csv(path_of_batched_ids, index=False, header=False)
+    return df
 
 
 def takebatch(rownum: int) -> list[str]:

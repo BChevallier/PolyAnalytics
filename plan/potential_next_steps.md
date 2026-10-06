@@ -2,14 +2,14 @@
 This file contains a semi ordered collection of things we might want to do at some point.
 
 ## Algorithms / Things we'll need to be able to do
-- [ ] Open replay in Polytopia from ID [*](/steps/openreplay.md)
-- [ ] Get access to screen for further processing [*](/steps/openreplay.md)
-- [ ] Get access to mouse and keyboard inputs *
+- [x] Open replay in Polytopia from ID [*](steps/openreplay.md)
+- [x] Get access to screen for further processing [*](steps/openreplay.md)
+- [x] Get access to mouse and keyboard inputs *
 - [ ] detect when new turn begins *
-- [ ] identify tribes playing *
-- [ ] detect who won
-- [ ] detect map type
-- [ ] detect map size
+- [x] identify tribes playing *
+- [x] detect who won (1v1 only)
+- [x] detect map type
+- [x] detect map size
 - [ ] detect stars added per turn
 - [ ] detect stars spent per turn
 - [ ] detect technologies unlocked so far *

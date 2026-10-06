@@ -73,19 +73,21 @@ def take_screenshot(name=None):
 
 def setup_input_module():
     """Detect and import the best available input module."""
+    # the input modules live in Linux-specific/ (not importable as a package because of the hyphen)
+    sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "Linux-specific"))
     try:
         import linuxInputs_evdev as inputs
 
         log("Using evdev (hardware-level input)")
         return inputs, "evdev"
-    except (ImportError, OSError) as e:
+    except (ImportError, OSError, RuntimeError) as e:  # the module raises RuntimeError if evdev is missing
         log(f"evdev not available ({e}), falling back to pynput")
         try:
             import linuxInputs as inputs
 
             log("Using pynput (X11 input)")
             return inputs, "pynput"
-        except ImportError:
+        except (ImportError, RuntimeError):
             log("WARNING: No input module available!")
             return None, None
 
@@ -132,6 +134,7 @@ def collect_replay_data(replay_id, inputs):
     inputs.mouse_diag_drag(120, 120)  # move camera to avoid messy background
     
     data = {}
+    player_colors = {}
     
     # Get menu info
     log("Getting menu infos")
@@ -157,6 +160,7 @@ def collect_replay_data(replay_id, inputs):
             continue
         
         player_color = ipro.get_color_from_coords(frame, [(9, 33)])[0]
+        player_colors[Player] = player_color
         tribe_by_color = cpro.identify_tribe(player_color)
         
         inputs.mouse_click_nominal(700, 430)  # open tech tree
@@ -183,8 +187,8 @@ def collect_replay_data(replay_id, inputs):
     inputs.press_key(20)  # press 3 to see if there is a third player
     time.sleep(0.2)
     frame = take_screenshot()
-    if frame is not None:
-        if ipro.get_color_from_coords(frame, [(9, 33)])[0] == player_color:
+    if frame is not None and "B" in player_colors:
+        if cpro.colors_are_similar(ipro.get_color_from_coords(frame, [(9, 33)])[0], player_colors["B"]):
             data["1v1"] = True
         else:
             data["1v1"] = False
@@ -210,12 +214,12 @@ def collect_replay_data(replay_id, inputs):
         if frame is not None:
             color_at_end = ipro.get_color_from_coords(frame, [(9, 33)])[:3][0]
             log(f"Color at end is: {color_at_end}")
-            if color_at_end == player_color:
+            if cpro.colors_are_similar(color_at_end, player_colors["B"]):
                 data["Winner"] = "B"
-            else:
-                log(f"Seen color: {ipro.get_color_from_coords(frame, [(740, 430)])[:3]}")
-                log(f"Saved Color for Player B: {player_color}")
+            elif cpro.colors_are_similar(color_at_end, player_colors["A"]):
                 data["Winner"] = "A"
+            else:  # matches neither player: leave the winner empty instead of guessing
+                log(f"Color at end matches neither player (A: {player_colors['A']}, B: {player_colors['B']})")
     
     time.sleep(3)
     return data
@@ -290,6 +294,9 @@ def main():
                     p.kill()
                 steam_out.close()
                 
+                # Save after every game, so a crash doesn't lose the batch
+                df.to_csv(f"collected_data/Batch{batch_num}.csv")
+
                 # Wait for cleanup
                 time.sleep(5)
             

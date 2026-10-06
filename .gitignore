@@ -1,5 +1,17 @@
-#here you can ignore some documents:
-
+# logs and scratch output
 *.txt
 *.log
-*./code/Linux-specific/INPUT_METHODS.md
+debug_screenshots/
+
+# IDE and OS files
+.idea/
+.DS_Store
+__pycache__/
+.venv/
+
+# Local context (never commit)
+CLAUDE.md
+changelog.md
+
+# notes kept local
+code/Linux-specific/INPUT_METHODS.md
